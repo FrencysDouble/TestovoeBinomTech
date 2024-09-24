@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="68dp"
+    android:layout_height="68dp">
+
+    <!-- Векторный фон маркера -->
+    <ImageView
+        android:id="@+id/marker_background"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/ic_tracker_tag_68dp"
+        android:scaleType="centerCrop"/>
+
+    <!-- Круглое изображение пользователя -->
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/profile_image"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:src="@drawable/vin"
+        android:layout_gravity="center"
+        android:layout_marginBottom="4dp"
+        app:civ_border_width="2dp"
+        app:civ_border_color="#FF000000"/>
+</FrameLayout>
