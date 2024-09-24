@@ -1,7 +1,6 @@
 package com.example.testovoebinomtech.controllers
 
 import android.Manifest
-import android.app.Application
 import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Location
@@ -14,7 +13,11 @@ import androidx.lifecycle.ViewModel
 import com.example.testovoebinomtech.R
 import com.example.testovoebinomtech.models.MarkerModel
 import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
 import org.osmdroid.util.GeoPoint
 
 class MainScreenController(private val context : Context) : ViewModel() {
@@ -28,6 +31,9 @@ class MainScreenController(private val context : Context) : ViewModel() {
     val markers: LiveData<List<MarkerModel>> get() = _markers
 
     val isDialogShow : MutableState<Boolean> = mutableStateOf(false)
+
+    private var locationRequest: LocationRequest
+
 
     init {
         val initialMarkers = listOf(
@@ -55,23 +61,32 @@ class MainScreenController(private val context : Context) : ViewModel() {
             )
         )
         _markers.value = initialMarkers
+
+        locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 10000)
+            .setDurationMillis(5000)
+            .build()
     }
 
-    fun updateLocation() {
+    fun startLocationUpdates() {
         if (ContextCompat.checkSelfPermission(
                 context,
                 Manifest.permission.ACCESS_FINE_LOCATION
             ) == PackageManager.PERMISSION_GRANTED
         ) {
-            fusedLocationClient.lastLocation
-                .addOnSuccessListener { location ->
-                    _location.value = location
-                }
-                .addOnFailureListener {
-                }
-        } else {
-            _location.value = null
+            fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null)
         }
+    }
+
+    private val locationCallback = object : LocationCallback() {
+        override fun onLocationResult(locationResult: LocationResult) {
+            locationResult.lastLocation?.let { location ->
+                _location.value = location
+            }
+        }
+    }
+
+    fun stopLocationUpdates() {
+        fusedLocationClient.removeLocationUpdates(locationCallback)
     }
 
     fun dialogActive()

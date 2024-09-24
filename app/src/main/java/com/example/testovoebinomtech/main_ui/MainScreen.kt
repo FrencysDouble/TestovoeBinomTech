@@ -20,6 +20,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -69,7 +70,7 @@ fun MainScreen(mainScreenController: MainScreenController) {
         onResult = { isGranted: Boolean ->
             hasLocationPermission = isGranted
             if (isGranted) {
-                mainScreenController.updateLocation()
+                mainScreenController.startLocationUpdates()
             }
         }
     )
@@ -81,12 +82,16 @@ fun MainScreen(mainScreenController: MainScreenController) {
                 context, Manifest.permission.ACCESS_FINE_LOCATION
             ) -> {
                 hasLocationPermission = true
-                mainScreenController.updateLocation()
+                mainScreenController.startLocationUpdates()
             }
             else -> {
                 requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
             }
         }
+    }
+
+    DisposableEffect(Unit) {
+        onDispose { mainScreenController.stopLocationUpdates() }
     }
 
     var showInfoWindow by remember { mutableStateOf(false) }
